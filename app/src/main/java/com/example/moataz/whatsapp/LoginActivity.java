@@ -21,7 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
-private FirebaseUser currentUser;
+
 private EditText emailLogin,passwordLogin;
 private TextView fogetPassword,needNewAccount;
 private Button loginButton,phoneLogin;
@@ -34,12 +34,11 @@ ProgressDialog progressDialog;
         intializeField();
         progressDialog=new ProgressDialog(LoginActivity.this);
         userAuth=FirebaseAuth.getInstance();
-    //currentUser=userAuth.getCurrentUser();
+
         needNewAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendUserToRegisterActivity();
-
             }
         });
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -48,9 +47,7 @@ ProgressDialog progressDialog;
                 loginUser();
             }
         });
-
-    }
-
+        }
     private void loginUser() {
         String email=emailLogin.getText().toString();
         String userpassword=passwordLogin.getText().toString();
@@ -70,6 +67,7 @@ ProgressDialog progressDialog;
         {
             progressDialog.setTitle("loading");
             progressDialog.setMessage("wait please");
+            progressDialog.setCanceledOnTouchOutside(true);
 
             progressDialog.show();
             userAuth.signInWithEmailAndPassword(email,userpassword)
@@ -79,6 +77,7 @@ ProgressDialog progressDialog;
                        if (task.isSuccessful())
                        {
                            sendUserToMainActivity();
+                           finish();
                            progressDialog.dismiss();
 
                        }
@@ -112,23 +111,23 @@ ProgressDialog progressDialog;
         phoneLogin=findViewById(R.id.login_phone);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if(currentUser!=null)
-        {
-            sendUserToMainActivity();
-        }
-    }
+
 
     private void sendUserToRegisterActivity() {
-        Intent RegisterIntent=new Intent(LoginActivity.this,RegisterActivity.class);
-        startActivity(RegisterIntent);
+        Intent registerIntent=new Intent(LoginActivity.this,RegisterActivity.class);
+
+        startActivity(registerIntent);
+
     }
     private void sendUserToMainActivity() {
         Intent loginIntent=new Intent(LoginActivity.this,MainActivity.class);
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(loginIntent);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }
